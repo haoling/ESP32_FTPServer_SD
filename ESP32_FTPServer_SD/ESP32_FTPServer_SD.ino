@@ -1,6 +1,7 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include "ESP32FtpServer.h"
+#include <M5StackUpdater.h>
 
 const char* ssid = "*********************";
 const char* password = "*********************";
@@ -29,8 +30,15 @@ void setup(void){
       Serial.println("SD opened!");
       ftpSrv.begin("esp32","esp32");    //username, password for ftp.  set ports in ESP32FtpServer.h  (default 21, 50009 for PASV)
   }    
+
+  pinMode(RETURN_MENU_PIN, INPUT);
 }
 
 void loop(void){
   ftpSrv.handleFTP();        //make sure in loop you call handleFTP()!!   
+  if(digitalRead(RETURN_MENU_PIN) == 0) {
+    Serial.println("Will Load menu binary");
+    updateFromFS(SD);
+    ESP.restart();
+  }
 }
